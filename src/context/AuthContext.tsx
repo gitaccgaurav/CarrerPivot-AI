@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 interface AuthContextValue {
   session: Session | null;
@@ -16,10 +16,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    if (!isSupabaseConfigured) {
       setLoading(false);
-    });
+      return;
+    }
+
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        setSession(data.session);
+        setLoading(false);
+      })
+      .catch(() => {
+        // A temporary auth/network failure should not leave the whole app stuck
+        // on a loading screen.
+        setLoading(false);
+      });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
@@ -32,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
+    if (!isSupabaseConfigured) return;
     await supabase.auth.signOut();
   };
 
