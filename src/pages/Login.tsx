@@ -40,9 +40,9 @@ export default function Login() {
     }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      // HashRouter routes must follow the origin directly; including `/login`
-      // makes Vercel treat the callback as a server-side path.
-      options: { redirectTo: `${window.location.origin}/#/dashboard` },
+      // Keep the callback on the site root so Supabase can exchange its query
+      // string before HashRouter takes over client-side routing.
+      options: { redirectTo: `${window.location.origin}/` },
     });
     if (error) setError(error.message.includes('provider is not enabled')
       ? 'Google sign-in is not enabled yet. Please use email and password or contact support.'

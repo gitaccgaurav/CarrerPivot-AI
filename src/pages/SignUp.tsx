@@ -40,7 +40,7 @@ export default function SignUp() {
     }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/#/dashboard` },
+      options: { redirectTo: `${window.location.origin}/` },
     });
     if (error) setError(error.message.includes('provider is not enabled')
       ? 'Google sign-in is not enabled yet. Please use email and password or contact support.'
