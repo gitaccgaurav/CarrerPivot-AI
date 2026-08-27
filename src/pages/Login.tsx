@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Sparkles, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 interface LocationState {
   from?: { pathname: string };
@@ -34,11 +34,17 @@ export default function Login() {
 
   const handleGoogle = async () => {
     setError(null);
+    if (!isSupabaseConfigured) {
+      setError('Sign-in is temporarily unavailable. Please try again later.');
+      return;
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}${window.location.pathname}#/dashboard` },
     });
-    if (error) setError(error.message);
+    if (error) setError(error.message.includes('provider is not enabled')
+      ? 'Google sign-in is not enabled yet. Please use email and password or contact support.'
+      : error.message);
   };
 
   return (
