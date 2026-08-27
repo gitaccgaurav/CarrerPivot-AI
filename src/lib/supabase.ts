@@ -10,7 +10,7 @@ const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || de
 
 const authCallbackParams = ['code', 'access_token', 'refresh_token', 'error', 'error_description'];
 
-export function isAuthCallbackUrl(url = window.location.href) {
+export function isAuthCallbackUrl(url: string) {
   const parsedUrl = new URL(url);
   const hashParams = new URLSearchParams(parsedUrl.hash.replace(/^#/, ''));
 
@@ -19,6 +19,9 @@ export function isAuthCallbackUrl(url = window.location.href) {
     authCallbackParams.some((param) => parsedUrl.searchParams.has(param) || hashParams.has(param))
   );
 }
+
+export const hadAuthCallbackInUrlOnLoad =
+  typeof window !== 'undefined' && isAuthCallbackUrl(window.location.href);
 
 /** Whether auth and database features can be used in this deployment. */
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);

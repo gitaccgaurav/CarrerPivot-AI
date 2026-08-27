@@ -1,6 +1,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
-import { isAuthCallbackUrl, isSupabaseConfigured, supabase } from '@/lib/supabase';
+import {
+  hadAuthCallbackInUrlOnLoad,
+  isAuthCallbackUrl,
+  isSupabaseConfigured,
+  supabase,
+} from '@/lib/supabase';
 
 interface AuthContextValue {
   session: Session | null;
@@ -12,7 +17,11 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function redirectAuthCallbackToDashboard(session: Session | null) {
-  if (!session || !isAuthCallbackUrl()) return;
+  const isAuthCallback =
+    hadAuthCallbackInUrlOnLoad ||
+    (typeof window !== 'undefined' && isAuthCallbackUrl(window.location.href));
+
+  if (!session || !isAuthCallback) return;
 
   window.location.replace(`${window.location.origin}/#/dashboard`);
 }
