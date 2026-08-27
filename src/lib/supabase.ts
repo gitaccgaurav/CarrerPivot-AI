@@ -8,6 +8,18 @@ const defaultSupabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
 const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string) || defaultSupabaseUrl;
 const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || defaultSupabaseAnonKey;
 
+const authCallbackParams = ['code', 'access_token', 'refresh_token', 'error', 'error_description'];
+
+export function isAuthCallbackUrl(url = window.location.href) {
+  const parsedUrl = new URL(url);
+  const hashParams = new URLSearchParams(parsedUrl.hash.replace(/^#/, ''));
+
+  return (
+    parsedUrl.pathname === '/auth/callback' ||
+    authCallbackParams.some((param) => parsedUrl.searchParams.has(param) || hashParams.has(param))
+  );
+}
+
 /** Whether auth and database features can be used in this deployment. */
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
