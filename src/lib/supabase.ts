@@ -4,7 +4,11 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Check .env file.');
+  const isProduction = import.meta.env.PROD;
+  const errorMsg = isProduction
+    ? 'Missing Supabase environment variables on Vercel. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel Project Settings → Environment Variables.'
+    : 'Missing Supabase environment variables. Create a .env file with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.';
+  throw new Error(errorMsg);
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
